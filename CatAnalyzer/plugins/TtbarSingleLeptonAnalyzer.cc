@@ -109,6 +109,8 @@ private:
   float b_Lepton_pz;
   float b_Lepton_E;
   float b_Lepton_pT;
+  float b_Lepton_Eta;
+  float b_Lepton_Iso;
 
   // Jets
   int b_Jet_Number;
@@ -210,6 +212,8 @@ TtbarSingleLeptonAnalyzer::TtbarSingleLeptonAnalyzer(const edm::ParameterSet& iC
   tree->Branch("lepton_pz", &b_Lepton_pz, "lepton_pz/F");
   tree->Branch("lepton_E" , &b_Lepton_E,  "lepton_E/F" );
   tree->Branch("lepton_pT", &b_Lepton_pT, "lepton_pT/F" );
+  tree->Branch("lepton_Eta", &b_Lepton_Eta, "lepton_Eta/F" );
+  tree->Branch("lepton_Iso", &b_Lepton_Iso, "lepton_Iso/F" );
 
   tree->Branch("jet_px", "std::vector<float>", &b_Jet_px);
   tree->Branch("jet_py", "std::vector<float>", &b_Jet_py);
@@ -505,12 +509,14 @@ void TtbarSingleLeptonAnalyzer::analyze(const edm::Event& iEvent, const edm::Eve
 
   TLorentzVector lepton;
   int ch_tag  = 999;
+  float isolation=-999.;
 
   if(selectedMuons.size()     == 1 &&
      vetoMuons.size()         == 0 &&
      selectedElectrons.size() == 0 &&
      vetoElectrons.size()     == 0){
     lepton.SetPxPyPzE(selectedMuons[0].px(), selectedMuons[0].py(), selectedMuons[0].pz(), selectedMuons[0].energy());
+    isolation= selectedMuons[0].relIso(0.4); 
     ch_tag = 0; //muon + jets
   }
 
@@ -519,6 +525,7 @@ void TtbarSingleLeptonAnalyzer::analyze(const edm::Event& iEvent, const edm::Eve
      selectedElectrons.size() == 1 &&
      vetoElectrons.size()     == 0){
     lepton.SetPxPyPzE(selectedElectrons[0].px(), selectedElectrons[0].py(), selectedElectrons[0].pz(), selectedElectrons[0].energy());
+    isolation= selectedElectrons[0].relIso(); 
     ch_tag = 1; //electron + jets
   }
 
@@ -566,6 +573,8 @@ void TtbarSingleLeptonAnalyzer::analyze(const edm::Event& iEvent, const edm::Eve
     b_Lepton_pz = lepton.Pz();
     b_Lepton_E  = lepton.E();
     b_Lepton_pT = lepton.Pt();
+    b_Lepton_Eta = lepton.Eta();
+    b_Lepton_Iso = isolation;
 
     //---------------------------------------------------------------------------
     //---------------------------------------------------------------------------
@@ -644,7 +653,7 @@ bool TtbarSingleLeptonAnalyzer::IsTightMuon(const cat::Muon & i_muon_candidate)
   // relIso( R ) already includes PU subtraction
   // float relIso = ( chIso + std::max(0.0, nhIso + phIso - 0.5*PUIso) )/ ecalpt;
 
-  GoodMuon &=( i_muon_candidate.relIso( 0.4 ) < 0.15 );
+  //GoodMuon &=( i_muon_candidate.relIso( 0.4 ) < 0.15 );
 
   //----------------------------------------------------------------------------------------------------
   //----------------------------------------------------------------------------------------------------
@@ -705,7 +714,7 @@ bool TtbarSingleLeptonAnalyzer::IsTightElectron(const cat::Electron & i_electron
   // relIso( R ) already includes AEff and RhoIso
   // float relIso = ( chIso + std::max(0.0, nhIso + phIso - rhoIso*AEff) )/ ecalpt;
 
-  GoodElectron &=( i_electron_candidate.relIso( 0.3 ) < 0.12 );
+  //GoodElectron &=( i_electron_candidate.relIso( 0.3 ) < 0.12 );
 
   // Effective Area Parametrization can be found in:
   // Last recommendation: https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonId2015 Slide 8
