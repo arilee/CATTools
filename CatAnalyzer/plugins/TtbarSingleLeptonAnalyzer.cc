@@ -139,7 +139,7 @@ private:
   //---------------------------------------------------------------------------
 
   // Number of events
-  TH1F *EventInfo;
+  TH1D *EventInfo;
 
 };
 
@@ -235,7 +235,7 @@ TtbarSingleLeptonAnalyzer::TtbarSingleLeptonAnalyzer(const edm::ParameterSet& iC
   tree->Branch("jet_CSV" , "std::vector<float>", &b_Jet_CSV );
 
 
-  EventInfo = fs->make<TH1F>("EventInfo","Event Information",5,0,5); 
+  EventInfo = fs->make<TH1D>("EventInfo","Event Information",5,0,5); 
   EventInfo->GetXaxis()->SetBinLabel(1,"Number of Events");
   EventInfo->GetXaxis()->SetBinLabel(2,"Sum of Weights");
 
