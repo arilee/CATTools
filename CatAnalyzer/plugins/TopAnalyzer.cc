@@ -85,7 +85,8 @@ class TopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       float Muon_Eta[100];
       float Muon_Phi[100];
       float Muon_E[100];
-      float Muon_Iso[100];
+      float Muon_Iso03[100];
+      float Muon_Iso04[100];
       float Muon_Charge[100];
 
       int NLooseMuon;
@@ -94,7 +95,8 @@ class TopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       float LooseMuon_Eta[100];
       float LooseMuon_Phi[100];
       float LooseMuon_E[100];
-      float LooseMuon_Iso[100];
+      float LooseMuon_Iso03[100];
+      float LooseMuon_Iso04[100];
       float LooseMuon_Charge[100];
 
       int NElectron;
@@ -103,7 +105,8 @@ class TopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       float Electron_Eta[100];
       float Electron_Phi[100];
       float Electron_E[100];
-      float Electron_Iso[100];
+      float Electron_Iso03[100];
+      float Electron_Iso04[100];
       float Electron_Charge[100];
 
       int NLooseElectron;
@@ -112,7 +115,8 @@ class TopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       float LooseElectron_Eta[100];
       float LooseElectron_Phi[100];
       float LooseElectron_E[100];
-      float LooseElectron_Iso[100];
+      float LooseElectron_Iso03[100];
+      float LooseElectron_Iso04[100];
       float LooseElectron_Charge[100];
 
 
@@ -122,14 +126,31 @@ class TopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       float Jet_Eta[100];
       float Jet_Phi[100];
       float Jet_E[100];
+      float Jet_partonFlavour[100];
+      float Jet_hadronFlavour[100];
       float Jet_BTag[100];
       float Jet_bDiscriminator[100];
-  
+ 
+      float Jet_JES_Up[100];
+      float Jet_JES_Dw[100];
+ 
       int NBJet;
 
       int DiLeptonic;
       int SemiLeptonic;
-  
+ 
+      int GenNJet20;
+      int GenNBJet20;
+      int GenNCJet20;
+      int GenNAddJet20;
+      int GenNAddBJet20;
+      int GenNAddCJet20;
+      
+      float GenLepton1_Pt;
+      float GenLepton1_Eta;
+      float GenLepton2_Pt;
+      float GenLepton2_Eta;
+ 
       float WMuon_MT[100];
       float WMuon_Phi[100];
       float WElectron_MT[100];
@@ -208,6 +229,24 @@ TopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      cat::GenTop catGenTop = genTops->at(0);
      DiLeptonic = catGenTop.diLeptonic(0);
      SemiLeptonic = catGenTop.semiLeptonic(0);
+
+     GenNJet20 = catGenTop.NJets20();
+     GenNBJet20 = catGenTop.NbJets20();
+     GenNCJet20 = catGenTop.NcJets20();
+     GenNAddJet20 = catGenTop.NaddJets20();
+     GenNAddBJet20 = catGenTop.NaddbJets20();
+     GenNAddCJet20 = catGenTop.NaddcJets20();
+
+     if( catGenTop.lepton1().pt() > 0){
+       GenLepton1_Pt = catGenTop.lepton1().pt();
+       GenLepton1_Eta = catGenTop.lepton1().eta();
+     }
+
+     if( catGenTop.lepton2().pt() > 0){
+       GenLepton2_Pt = catGenTop.lepton2().pt();
+       GenLepton2_Eta = catGenTop.lepton2().eta();
+     }
+
    }
 
    if(!iEvent.isRealData()) {
@@ -256,7 +295,8 @@ TopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      LooseMuon_Eta[nmuons] = muon.eta();
      LooseMuon_Phi[nmuons] = muon.phi();
      LooseMuon_E[nmuons] = muon.energy();
-     LooseMuon_Iso[nmuons] = muon.relIso(0.4);
+     LooseMuon_Iso03[nmuons] = muon.relIso(0.3);
+     LooseMuon_Iso04[nmuons] = muon.relIso(0.4);
      LooseMuon_Charge[nmuons] = muon.charge();
      nloosemuons++;
 
@@ -269,7 +309,8 @@ TopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      Muon_Eta[nmuons] = muon.eta(); 
      Muon_Phi[nmuons] = muon.phi(); 
      Muon_E[nmuons] = muon.energy();
-     Muon_Iso[nmuons] = muon.relIso(0.4);
+     Muon_Iso03[nmuons] = muon.relIso(0.3);
+     Muon_Iso04[nmuons] = muon.relIso(0.4);
      Muon_Charge[nmuons] = muon.charge();
 
      WMuon_MT[nmuons] = transverseMass( muon.p4(), METHandle->begin()->p4() );
@@ -294,7 +335,8 @@ TopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      LooseElectron_Eta[nelectrons] = electron.eta();
      LooseElectron_Phi[nelectrons] = electron.phi();
      LooseElectron_E[nelectrons] = electron.energy();
-     LooseElectron_Iso[nelectrons] = electron.relIso();
+     LooseElectron_Iso03[nelectrons] = electron.relIso(0.3);
+     LooseElectron_Iso04[nelectrons] = electron.relIso(0.4);
      LooseElectron_Charge[nelectrons] = electron.charge();
      nlooseelectrons++;
 
@@ -307,7 +349,8 @@ TopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      Electron_Eta[nelectrons] = electron.eta();
      Electron_Phi[nelectrons] = electron.phi();
      Electron_E[nelectrons] = electron.energy();
-     Electron_Iso[nelectrons] = electron.relIso();
+     Electron_Iso03[nelectrons] = electron.relIso(0.3);
+     Electron_Iso04[nelectrons] = electron.relIso(0.4);
      Electron_Charge[nelectrons] = electron.charge();
 
      WElectron_MT[nelectrons] = transverseMass( electron.p4(), METHandle->begin()->p4() );
@@ -333,14 +376,14 @@ TopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      TLorentzVector vjet(jet.px(), jet.py(), jet.pz(), jet.energy());
 
      for(int j = 0 ; j < NMuon ; j++){ 
-       if( Muon_Iso[j] < 0.15 ){
+       if( Muon_Iso03[j] < 0.15 ){
          TLorentzVector vlep(Muon_Pt[j], Muon_Eta[j], Muon_Phi[j], Muon_E[j]);
          dr = vjet.DeltaR(vlep);
        }
      }
 
      for(int j = 0 ; j < NElectron ; j++){
-       if( Electron_Iso[j] < 0.15 ){
+       if( Electron_Iso03[j] < 0.15 ){
          TLorentzVector vlep(Electron_Pt[j], Electron_Eta[j], Electron_Phi[j], Electron_E[j]);
          dr = vjet.DeltaR(vlep);
        }
@@ -352,6 +395,12 @@ TopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      Jet_Eta[nJets] = jet.eta();
      Jet_Phi[nJets] = jet.phi();
      Jet_E[nJets] = jet.energy();
+
+     Jet_partonFlavour[nJets] = jet.partonFlavour();
+     Jet_hadronFlavour[nJets] = jet.hadronFlavour();
+
+     Jet_JES_Up[nJets] = jet.shiftedEnUp();
+     Jet_JES_Dw[nJets] = jet.shiftedEnDown();
 
      double bDiscriminator = jet.bDiscriminator(BTAG_CSVv2);
      Jet_bDiscriminator[nJets] = bDiscriminator;
@@ -401,7 +450,8 @@ TopAnalyzer::beginJob()
    tree->Branch("Muon_Eta",Muon_Eta,"Muon_Eta[NMuon]/F");
    tree->Branch("Muon_Phi",Muon_Phi,"Muon_Phi[NMuon]/F");
    tree->Branch("Muon_E",Muon_E,"Muon_E[NMuon]/F");
-   tree->Branch("Muon_Iso",Muon_Iso,"Muon_Iso[NMuon]/F");
+   tree->Branch("Muon_Iso03",Muon_Iso03,"Muon_Iso03[NMuon]/F");
+   tree->Branch("Muon_Iso04",Muon_Iso04,"Muon_Iso04[NMuon]/F");
    tree->Branch("Muon_Charge",Muon_Charge,"Muon_Charge[NMuon]/F");
 
    tree->Branch("NLooseMuon",&NLooseMuon,"NLooseMuon/I");
@@ -409,7 +459,8 @@ TopAnalyzer::beginJob()
    tree->Branch("LooseMuon_Eta",LooseMuon_Eta,"LooseMuon_Eta[NLooseMuon]/F");
    tree->Branch("LooseMuon_Phi",LooseMuon_Phi,"LooseMuon_Phi[NLooseMuon]/F");
    tree->Branch("LooseMuon_E",LooseMuon_E,"LooseMuon_E[NLooseMuon]/F");
-   tree->Branch("LooseMuon_Iso",LooseMuon_Iso,"LooseMuon_Iso[NLooseMuon]/F");
+   tree->Branch("LooseMuon_Iso03",LooseMuon_Iso03,"LooseMuon_Iso03[NLooseMuon]/F");
+   tree->Branch("LooseMuon_Iso04",LooseMuon_Iso04,"LooseMuon_Iso04[NLooseMuon]/F");
    tree->Branch("LooseMuon_Charge",LooseMuon_Charge,"LooseMuon_Charge[NLooseMuon]/F");
 
    tree->Branch("NElectron",&NElectron,"NElectron/I");
@@ -417,7 +468,8 @@ TopAnalyzer::beginJob()
    tree->Branch("Electron_Eta",Electron_Eta,"Electron_Eta[NElectron]/F");
    tree->Branch("Electron_Phi",Electron_Phi,"Electron_Phi[NElectron]/F");
    tree->Branch("Electron_E",Electron_E,"Electron_E[NElectron]/F");
-   tree->Branch("Electron_Iso",Electron_Iso,"Electron_Iso[NElectron]/F");
+   tree->Branch("Electron_Iso03",Electron_Iso03,"Electron_Iso03[NElectron]/F");
+   tree->Branch("Electron_Iso04",Electron_Iso04,"Electron_Iso04[NElectron]/F");
    tree->Branch("Electron_Charge",Electron_Charge,"Electron_Charge[NElectron]/F");
 
    tree->Branch("NLooseElectron",&NLooseElectron,"NLooseElectron/I");
@@ -425,7 +477,8 @@ TopAnalyzer::beginJob()
    tree->Branch("LooseElectron_Eta",LooseElectron_Eta,"LooseElectron_Eta[NLooseElectron]/F");
    tree->Branch("LooseElectron_Phi",LooseElectron_Phi,"LooseElectron_Phi[NLooseElectron]/F");
    tree->Branch("LooseElectron_E",LooseElectron_E,"LooseElectron_E[NLooseElectron]/F");
-   tree->Branch("LooseElectron_Iso",LooseElectron_Iso,"LooseElectron_Iso[NLooseElectron]/F");
+   tree->Branch("LooseElectron_Iso03",LooseElectron_Iso03,"LooseElectron_Iso03[NLooseElectron]/F");
+   tree->Branch("LooseElectron_Iso04",LooseElectron_Iso04,"LooseElectron_Iso04[NLooseElectron]/F");
    tree->Branch("LooseElectron_Charge",LooseElectron_Charge,"LooseElectron_Charge[NLooseElectron]/F");
 
    tree->Branch("NJet",&NJet,"NJet/i");
@@ -433,19 +486,35 @@ TopAnalyzer::beginJob()
    tree->Branch("Jet_Eta",Jet_Eta,"Jet_Eta[NJet]/F");
    tree->Branch("Jet_Phi",Jet_Phi,"Jet_Phi[NJet]/F");
    tree->Branch("Jet_E",Jet_E,"Jet_E[NJet]/F");
+   tree->Branch("Jet_partonFlavour",Jet_partonFlavour,"Jet_partonFlavour[NJet]/F");
+   tree->Branch("Jet_hadronFlavour",Jet_hadronFlavour,"Jet_hadronFlavour[NJet]/F");
    tree->Branch("Jet_BTag",Jet_BTag,"Jet_BTag[NJet]/F");
    tree->Branch("Jet_bDiscriminator",Jet_bDiscriminator,"Jet_bDiscriminator[NJet]/F"); 
+
+   tree->Branch("Jet_JES_Up",Jet_JES_Up,"Jet_JES_Up[NJet]/F");
+   tree->Branch("Jet_JES_Dw",Jet_JES_Dw,"Jet_JES_Dw[NJet]/F");
  
    tree->Branch("NBJet",&NBJet,"NBJet/i");
    tree->Branch("DiLeptonic",&DiLeptonic,"DiLeptonic/i");
    tree->Branch("SemiLeptonic",&SemiLeptonic,"SemiLeptonic/i");
+
+   tree->Branch("GenNJet20",&GenNJet20, "GenNJet20/i");
+   tree->Branch("GenNBJet20",&GenNBJet20, "GenNBJet20/i");
+   tree->Branch("GenNCJet20",&GenNCJet20, "GenNCJet20/i");
+   tree->Branch("GenNAddJet20",&GenNAddJet20, "GenNAddJet20/i");
+   tree->Branch("GenNAddBJet20",&GenNAddBJet20, "GenNAddBJet20/i");
+   tree->Branch("GenNAddCJet20",&GenNAddCJet20, "GenNAddCJet20/i");   
+
+   tree->Branch("GenLepton1_Pt",&GenLepton1_Pt, "GenLepton1_Pt/f");
+   tree->Branch("GenLepton1_Eta",&GenLepton1_Eta, "GenLepton1_Eta/f");
+   tree->Branch("GenLepton2_Pt",&GenLepton2_Pt, "GenLepton2_Pt/f");
+   tree->Branch("GenLepton2_Eta",&GenLepton2_Eta, "GenLepton2_Eta/f");
 
    tree->Branch("WMuon_MT",WMuon_MT,"WMuon_MT[NMuon]/F"); 
    tree->Branch("WMuon_Phi",WMuon_Phi,"WMuon_Phi[NMuon]/F"); 
    tree->Branch("WElectron_MT",WElectron_MT,"WElectron_MT[NElectron]/F"); 
    tree->Branch("WElectron_Phi",WElectron_Phi,"WElectron_Phi[NElectron]/F"); 
  
-
 }
 
 void
@@ -462,6 +531,18 @@ TopAnalyzer::clear(){
   NBJet = -1;
   DiLeptonic = -1;
   SemiLeptonic = -1;
+  
+  GenNJet20 = -1; 
+  GenNBJet20 = -1;
+  GenNCJet20 = -1;
+  GenNAddJet20 = -1;
+  GenNAddBJet20 = -1;
+  GenNAddCJet20 = -1;
+
+  GenLepton1_Pt = -9.0;
+  GenLepton1_Eta = -9.0;
+  GenLepton2_Pt = -9.0;
+  GenLepton2_Eta = -9.0;
 
 }
 
